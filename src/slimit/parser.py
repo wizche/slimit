@@ -901,7 +901,7 @@ class Parser(object):
         """variable_statement : VAR variable_declaration_list SEMI
                               | VAR variable_declaration_list auto_semi
         """
-        p[0] = ast.VarStatement(p[2])
+        p[0] = ast.VarStatement(p[2], p=p)
 
     def p_variable_declaration_list(self, p):
         """
@@ -932,18 +932,18 @@ class Parser(object):
                                 | identifier initializer
         """
         if len(p) == 2:
-            p[0] = ast.VarDecl(p[1])
+            p[0] = ast.VarDecl(p[1], p=p)
         else:
-            p[0] = ast.VarDecl(p[1], p[2])
+            p[0] = ast.VarDecl(p[1], p[2], p=p)
 
     def p_variable_declaration_noin(self, p):
         """variable_declaration_noin : identifier
                                      | identifier initializer_noin
         """
         if len(p) == 2:
-            p[0] = ast.VarDecl(p[1])
+            p[0] = ast.VarDecl(p[1], p=p)
         else:
-            p[0] = ast.VarDecl(p[1], p[2])
+            p[0] = ast.VarDecl(p[1], p[2], p=p)
 
     def p_initializer(self, p):
         """initializer : EQ assignment_expr"""
@@ -1013,14 +1013,14 @@ class Parser(object):
         iteration_statement : \
             FOR LPAREN VAR identifier IN expr RPAREN statement
         """
-        p[0] = ast.ForIn(item=ast.VarDecl(p[4]), iterable=p[6], statement=p[8])
+        p[0] = ast.ForIn(item=ast.VarDecl(p[4], p=p), iterable=p[6], statement=p[8])
 
     def p_iteration_statement_6(self, p):
         """
         iteration_statement \
           : FOR LPAREN VAR identifier initializer_noin IN expr RPAREN statement
         """
-        p[0] = ast.ForIn(item=ast.VarDecl(identifier=p[4], initializer=p[5]),
+        p[0] = ast.ForIn(item=ast.VarDecl(identifier=p[4], initializer=p[5], p=p),
                          iterable=p[7], statement=p[9])
 
     def p_expr_opt(self, p):
