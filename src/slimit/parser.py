@@ -45,12 +45,14 @@ class Parser(object):
     """
 
     def __init__(self, lex_optimize=True, lextab=lextab,
-                 yacc_optimize=True, yacctab=yacctab, yacc_debug=False):
+                 yacc_optimize=True, yacctab=yacctab, yacc_debug=False,
+                 yacc_tracking=False):
         self.lex_optimize = lex_optimize
         self.lextab = lextab
         self.yacc_optimize = yacc_optimize
         self.yacctab = yacctab
         self.yacc_debug = yacc_debug
+        self.yacc_tracking = yacc_tracking
 
         self.lexer = Lexer()
         self.lexer.build(optimize=lex_optimize, lextab=lextab)
@@ -90,7 +92,7 @@ class Parser(object):
             )
 
     def parse(self, text, debug=False):
-        return self.parser.parse(text, lexer=self.lexer, debug=debug)
+        return self.parser.parse(text, lexer=self.lexer, debug=debug, tracking=self.yacc_tracking)
 
     def p_empty(self, p):
         """empty :"""
