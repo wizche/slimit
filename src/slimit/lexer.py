@@ -120,6 +120,7 @@ class Lexer(object):
             except IndexError:
                 tok = self._get_update_token()
                 if tok is not None and tok.type == 'LINE_TERMINATOR':
+                    lexer.lineno += len(tok.value.splitlines());
                     continue
                 else:
                     return tok
@@ -128,6 +129,7 @@ class Lexer(object):
                 tok = self._get_update_token()
                 if tok.type in ('LINE_TERMINATOR',
                                 'LINE_COMMENT', 'BLOCK_COMMENT'):
+                    lexer.lineno += len(tok.value.splitlines());
                     continue
                 else:
                     return tok
