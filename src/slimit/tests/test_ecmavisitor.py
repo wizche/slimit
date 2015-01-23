@@ -29,30 +29,31 @@ import unittest
 
 from slimit.parser import Parser
 
-
-def decorator(cls):
-    def make_test_function(input, expected):
-
-        def test_func(self):
-            parser = Parser()
-            result = parser.parse(input).to_ecma()
-            self.assertMultiLineEqual(result, expected)
-
-        return test_func
-
-    for index, input in enumerate(cls.TEST_CASES):
-        input = textwrap.dedent(input).strip()
-        func = make_test_function(input, input)
-        setattr(cls, 'test_case_%d' % index, func)
-
-    return cls
+UnitTestMeta = type(unittest.TestCase)
 
 
-@decorator
+class VisitorTestMeta(UnitTestMeta):
+    def __new__(cls, name, bases, attributes):
+        test_cases = attributes.pop('TEST_CASES')
+
+        for idx, input_ in enumerate(test_cases):
+            name = 'test_case_{}'.format(idx)
+            attributes[name] = lambda self: self.case(input_)
+
+        return super(VisitorTestMeta, cls).__new__(cls, name, bases, attributes)
+
+
 class ECMAVisitorTestCase(unittest.TestCase):
+    __metaclass__ = VisitorTestMeta
 
     def setUp(self):
         self.maxDiff = 2000
+
+    def case(self, input_):
+        parser = Parser()
+        result = parser.parse(input_).to_ecma()
+        expected = textwrap.dedent(input_).strip()
+        self.assertMultiLineEqual(result, expected)
 
     TEST_CASES = [
         ################################
