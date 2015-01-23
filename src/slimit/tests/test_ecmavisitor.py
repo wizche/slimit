@@ -34,27 +34,21 @@ UnitTestMeta = type(unittest.TestCase)
 
 class VisitorTestMeta(UnitTestMeta):
     def __new__(cls, name, bases, attributes):
-        test_cases = attributes.pop('TEST_CASES')
+        try:
+            test_cases = attributes['TEST_CASES']
+        except KeyError:
+            test_cases = [getattr(b, 'TEST_CASES')
+                          for b in bases
+                          if hasattr(b, 'TEST_CASES')][0]
 
-        for idx, input_ in enumerate(test_cases):
+        for idx, case in enumerate(test_cases):
             name = 'test_case_{}'.format(idx)
-            attributes[name] = lambda self: self.case(input_)
+            attributes[name] = lambda self: self.case(case)
 
         return super(VisitorTestMeta, cls).__new__(cls, name, bases, attributes)
 
 
-class ECMAVisitorTestCase(unittest.TestCase):
-    __metaclass__ = VisitorTestMeta
-
-    def setUp(self):
-        self.maxDiff = 2000
-
-    def case(self, input_):
-        parser = Parser()
-        result = parser.parse(input_).to_ecma()
-        expected = textwrap.dedent(input_).strip()
-        self.assertMultiLineEqual(result, expected)
-
+class VisitorTestMixin(object):
     TEST_CASES = [
         ################################
         # block
@@ -504,3 +498,14 @@ class ECMAVisitorTestCase(unittest.TestCase):
         ]
 
 
+class ECMAVisitorTestCase(VisitorTestMixin, unittest.TestCase):
+    __metaclass__ = VisitorTestMeta
+
+    def setUp(self):
+        self.maxDiff = 2000
+
+    def case(self, case):
+        parser = Parser()
+        result = parser.parse(case).to_ecma()
+        expected = textwrap.dedent(case).strip()
+        self.assertMultiLineEqual(result, expected)
