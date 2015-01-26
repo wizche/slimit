@@ -189,12 +189,12 @@ class ECMAMinifier(object):
     def visit_BinOp(self, node):
         if node.op in ('instanceof', 'in'):
             template = '%s %s %s'
-        elif (node.op == '+' and
-              isinstance(node.right, ast.UnaryOp) and
-              node.right.op == '++' and not node.right.postfix
+        elif isinstance(node.right, ast.UnaryOp) and not node.right.postfix \
+             and (
+                (node.op == '+' and node.right.op in ('++', '+')) or
+                (node.op == '-' and node.right.op in ('--', '-'))
               ):
-            # make a space between + and ++
-            # https://github.com/rspivak/slimit/issues/26
+            # Don't merge + +, + ++, - - and - --
             template = '%s%s %s'
         else:
             template = '%s%s%s'
