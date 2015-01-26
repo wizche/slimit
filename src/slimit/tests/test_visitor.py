@@ -42,9 +42,14 @@ class VisitorTestMeta(UnitTestMeta):
                           for b in bases
                           if hasattr(b, 'TEST_CASES')][0]
 
+        def generate_test_func(name, case):
+            func = lambda self: self.case(case)
+            func.__name__ = name
+            return func
+
         for idx, case in enumerate(test_cases):
             name = 'test_case_{}'.format(idx)
-            attributes[name] = lambda self: self.case(case)
+            attributes[name] = generate_test_func(name, case)
 
         return super(VisitorTestMeta, cls).__new__(cls, name, bases, attributes)
 
