@@ -517,6 +517,19 @@ class ECMAVisitorTestCase(VisitorTestMixin, unittest.TestCase):
         self.assertMultiLineEqual(result, expected)
 
 
+class ParsingTestCase(VisitorTestMixin, unittest.TestCase):
+    __metaclass__ = VisitorTestMeta
+
+    def case(self, case):
+        parser_a = Parser()
+        result_a = parser_a.parse(case)
+
+        parser_b = Parser()
+        result_b = parser_b.parse(case)
+
+        self.assertEqual(result_a, result_b)
+
+
 class MinifierTestCase(unittest.TestCase):
     __metaclass__ = VisitorTestMeta
 
