@@ -29,10 +29,10 @@ import ply.yacc
 from slimit import ast
 from slimit.lexer import Lexer
 
-try:
-    from slimit import lextab, yacctab
-except ImportError:
-    lextab, yacctab = 'lextab', 'yacctab'
+# The default values for the `Parser` constructor, passed on to ply; they must
+# be strings
+lextab = '%s.lextab' % __package__
+yacctab = '%s.yacctab' % __package__
 
 
 class Parser(object):
