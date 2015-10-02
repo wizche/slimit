@@ -373,6 +373,7 @@ class Lexer(object):
                 | \\[a-zA-Z!-\/:-@\[-`{-~] # or escaped characters
                 | \\x[0-9a-fA-F]{2}        # or hex_escape_sequence
                 | \\u[0-9a-fA-F]{4}        # or unicode_escape_sequence
+                | \\(?:[1-7][0-7]{0,2}|[0-7]{2,3}) # or octal_escape_sequence (spec B.1.2)
             )*?                            # zero or many times
             (?: \\\n                       # multiline ?
               (?:
@@ -380,6 +381,7 @@ class Lexer(object):
                 | \\[a-zA-Z!-\/:-@\[-`{-~] # or escaped characters
                 | \\x[0-9a-fA-F]{2}        # or hex_escape_sequence
                 | \\u[0-9a-fA-F]{4}        # or unicode_escape_sequence
+                | \\(?:[1-7][0-7]{0,2}|[0-7]{2,3}) # or octal_escape_sequence (spec B.1.2)
               )*?                          # zero or many times
             )*
         ")                                 # closing double quote
@@ -390,6 +392,7 @@ class Lexer(object):
                 | \\[a-zA-Z!-\/:-@\[-`{-~] # or escaped characters
                 | \\x[0-9a-fA-F]{2}        # or hex_escape_sequence
                 | \\u[0-9a-fA-F]{4}        # or unicode_escape_sequence
+                | \\(?:[1-7][0-7]{0,2}|[0-7]{2,3}) # or octal_escape_sequence (spec B.1.2)
             )*?                            # zero or many times
             (?: \\\n                       # multiline ?
               (?:
@@ -397,6 +400,7 @@ class Lexer(object):
                 | \\[a-zA-Z!-\/:-@\[-`{-~] # or escaped characters
                 | \\x[0-9a-fA-F]{2}        # or hex_escape_sequence
                 | \\u[0-9a-fA-F]{4}        # or unicode_escape_sequence
+                | \\(?:[1-7][0-7]{0,2}|[0-7]{2,3}) # or octal_escape_sequence (spec B.1.2)
               )*?                          # zero or many times
             )*
         ')                                 # closing single quote
