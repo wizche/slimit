@@ -26,8 +26,14 @@ __author__ = 'Ruslan Spivak <ruslan.spivak@gmail.com>'
 
 
 class Node(object):
-    def __init__(self, children=None):
+    def __init__(self, children=None, p=None):
         self._children_list = [] if children is None else children
+        self.setpos(p)
+
+    def setpos(self, p):
+        self.lexpos = None if p is None else p.lexpos(1);
+        self.lineno = None if p is None else p.lineno(1);
+        # print 'setpos', self, p, self.lexpos, self.lineno
 
     def __iter__(self):
         for child in self.children():
@@ -309,10 +315,11 @@ class VarStatement(Node):
         return 'VarStatement(children={!r})'.format(self.children())
 
 class VarDecl(Node):
-    def __init__(self, identifier, initializer=None):
+    def __init__(self, identifier, initializer=None, p=None):
         self.identifier = identifier
         self.identifier._mangle_candidate = True
         self.initializer = initializer
+        self.setpos(p)
 
     def children(self):
         return [self.identifier, self.initializer]
