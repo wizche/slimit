@@ -389,7 +389,10 @@ class ECMAMinifier(object):
             template = '(%s.%s)'
         else:
             template = '%s.%s'
-        s = template % (self.visit(node.node), self.visit(node.identifier))
+        left = self.visit(node.node)
+        if isinstance(node.node, ast.Number):
+            left = '(%s)' % left
+        s = template % (left, self.visit(node.identifier))
         return s
 
     def visit_BracketAccessor(self, node):
@@ -402,7 +405,10 @@ class ECMAMinifier(object):
                 elif value.startswith('"'):
                     value = value.strip('"')
                 if _is_identifier(value):
-                    s = '%s.%s' % (self.visit(node.node), value)
+                    left = self.visit(node.node)
+                    if isinstance(node.node, ast.Number):
+                        left = '(%s)' % left
+                    s = '%s.%s' % (left, value)
                     return s
 
         s = '%s[%s]' % (self.visit(node.node), self.visit(node.expr))
