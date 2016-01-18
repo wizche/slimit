@@ -26,6 +26,9 @@ __author__ = 'Ruslan Spivak <ruslan.spivak@gmail.com>'
 
 
 class Node(object):
+    # used to avoid double processing during AST traversal
+    processed = False
+
     def __init__(self, children=None, p=None):
         self._children_list = [] if children is None else children
         self.setpos(p)
@@ -65,13 +68,16 @@ class Node(object):
         else:
             return NotImplemented
 
+
 class Program(Node):
     def __repr__(self):
         return 'Program(children={!r})'.format(self.children())
 
+
 class Block(Node):
     def __repr__(self):
         return 'Block(children={!r})'.format(self.children())
+
 
 class Boolean(Node):
     def __init__(self, value):
@@ -85,6 +91,7 @@ class Boolean(Node):
 
     def __repr__(self):
         return 'Boolean({!r})'.format(self.value)
+
 
 class Null(Node):
     def __init__(self, value):
@@ -100,6 +107,7 @@ class Null(Node):
     def __repr__(self):
         return 'Null()'
 
+
 class Number(Node):
     def __init__(self, value):
         self.value = value
@@ -112,6 +120,7 @@ class Number(Node):
 
     def __repr__(self):
         return 'Number(value={!r})'.format(self.value)
+
 
 class Identifier(Node):
     def __init__(self, value):
@@ -126,6 +135,7 @@ class Identifier(Node):
     def __repr__(self):
         return 'Identifier(value={!r})'.format(self.value)
 
+
 class String(Node):
     def __init__(self, value):
         self.value = value
@@ -138,6 +148,7 @@ class String(Node):
 
     def __repr__(self):
         return 'String(value={!r})'.format(self.value)
+
 
 class Regex(Node):
     def __init__(self, value):
@@ -152,6 +163,7 @@ class Regex(Node):
     def __repr__(self):
         return 'Regex(value={!r})'.format(self.value)
 
+
 class Array(Node):
     def __init__(self, items):
         self.items = items
@@ -165,6 +177,7 @@ class Array(Node):
     def _eq(self, other):
         return self.items == other.items
 
+
 class Object(Node):
     def __init__(self, properties=None):
         self.properties = [] if properties is None else properties
@@ -177,6 +190,7 @@ class Object(Node):
 
     def __repr__(self):
         return 'Object(properties={!r})'.format(self.properties)
+
 
 class NewExpr(Node):
     def __init__(self, identifier, args=None):
@@ -196,6 +210,7 @@ class NewExpr(Node):
         return 'NewExpr(identifier={!r}, args={!r})'.format(
             self.identifier, self.args)
 
+
 class FunctionCall(Node):
     def __init__(self, identifier, args=None):
         self.identifier = identifier
@@ -213,6 +228,7 @@ class FunctionCall(Node):
     def __repr__(self):
         return 'FunctionCall(identifier={!r}, args={!r})'.format(
             self.identifier, self.args)
+
 
 class BracketAccessor(Node):
     def __init__(self, node, expr):
@@ -232,6 +248,7 @@ class BracketAccessor(Node):
         return 'BracketAccessor(node={!r}, expr={!r})'.format(
             self.node, self.expr)
 
+
 class DotAccessor(Node):
     def __init__(self, node, identifier):
         self.node = node
@@ -249,6 +266,7 @@ class DotAccessor(Node):
     def __repr__(self):
         return 'DotAccessor(node={!r}, identifier={!r})'.format(
             self.node, self.identifier)
+
 
 class Assign(Node):
     def __init__(self, op, left, right):
@@ -270,6 +288,7 @@ class Assign(Node):
         return 'Assign(op={!r}, left={!r}, right={!r})'.format(
             self.op, self.left, self.right)
 
+
 class GetPropAssign(Node):
     def __init__(self, prop_name, elements):
         """elements - function body"""
@@ -288,6 +307,7 @@ class GetPropAssign(Node):
     def __repr__(self):
         return 'GetPropAssign(prop_name={!r}, elements={!r})'.format(
             self.prop_name, self.elements)
+
 
 class SetPropAssign(Node):
     def __init__(self, prop_name, parameters, elements):
@@ -310,9 +330,11 @@ class SetPropAssign(Node):
         fmt = 'SetPropAssign(prop_name={!r}, parameters={!r}, elements={!r}'
         return fmt.format(self.prop_name, self.parameters, self.elements)
 
+
 class VarStatement(Node):
     def __repr__(self):
         return 'VarStatement(children={!r})'.format(self.children())
+
 
 class VarDecl(Node):
     def __init__(self, identifier, initializer=None, p=None):
@@ -334,6 +356,7 @@ class VarDecl(Node):
         return 'VarDecl(identifier={!r}, initializer={!r})'.format(
             self.identifier, self.initializer)
 
+
 class UnaryOp(Node):
     def __init__(self, op, value, postfix=False):
         self.op = op
@@ -353,6 +376,7 @@ class UnaryOp(Node):
     def __repr__(self):
         return 'UnaryOp(op={!r}, value={!r}, postfix={!r})'.format(
             self.op, self.value, self.postfix)
+
 
 class BinOp(Node):
     def __init__(self, op, left, right):
@@ -374,8 +398,10 @@ class BinOp(Node):
         return 'BinOp(op={!r}, left={!r}, right={!r})'.format(
             self.op, self.left, self.right)
 
+
 class Conditional(Node):
     """Conditional Operator ( ? : )"""
+
     def __init__(self, predicate, consequent, alternative):
         self.predicate = predicate
         self.consequent = consequent
@@ -394,6 +420,7 @@ class Conditional(Node):
     def __repr__(self):
         fmt = 'Conditional(predicate={!r}, consequent={!r}, alternative={!r})'
         return fmt.format(self.predicate, self.consequent, self.alternative)
+
 
 class If(Node):
     def __init__(self, predicate, consequent, alternative=None):
@@ -415,6 +442,7 @@ class If(Node):
         return 'If(predicate={!r}, consequent={!r}, alternative={!r})'.format(
             self.predicate, self.consequent, self.alternative)
 
+
 class DoWhile(Node):
     def __init__(self, predicate, statement):
         self.predicate = predicate
@@ -433,6 +461,7 @@ class DoWhile(Node):
         return 'DoWhile(predicate={!r}, statement={!r})'.format(
             self.predicate, self.statement)
 
+
 class While(Node):
     def __init__(self, predicate, statement):
         self.predicate = predicate
@@ -450,6 +479,7 @@ class While(Node):
     def __repr__(self):
         return 'While(predicate={!r}, statement={!r})'.format(
             self.predicate, self.statement)
+
 
 class For(Node):
     def __init__(self, init, cond, count, statement):
@@ -473,6 +503,7 @@ class For(Node):
         return 'For(init={!r}, cond={!r}, count={!r}, statement={!r})'.format(
             self.init, self.cond, self.count, self.statement)
 
+
 class ForIn(Node):
     def __init__(self, item, iterable, statement):
         self.item = item
@@ -493,6 +524,7 @@ class ForIn(Node):
         return 'ForIn(item={!r}, iterable={!r}, statement={!r})'.format(
             self.item, self.iterable, self.statement)
 
+
 class Continue(Node):
     def __init__(self, identifier=None):
         self.identifier = identifier
@@ -505,6 +537,7 @@ class Continue(Node):
 
     def __repr__(self):
         return 'Continue()'
+
 
 class Break(Node):
     def __init__(self, identifier=None):
@@ -519,6 +552,7 @@ class Break(Node):
     def __repr__(self):
         return 'Break()'
 
+
 class Return(Node):
     def __init__(self, expr=None):
         self.expr = expr
@@ -531,6 +565,7 @@ class Return(Node):
 
     def __repr__(self):
         return 'Return(expr={!r})'.format(self.expr)
+
 
 class With(Node):
     def __init__(self, expr, statement):
@@ -545,6 +580,7 @@ class With(Node):
 
     def __repr__(self):
         return 'With(expr={!r})'.format(self.expr)
+
 
 class Switch(Node):
     def __init__(self, expr, cases, default=None):
@@ -566,6 +602,7 @@ class Switch(Node):
         return 'Switch(expr={!r}, cases={!r}, default={!r})'.format(
             self.expr, self.cases, self.default)
 
+
 class Case(Node):
     def __init__(self, expr, elements):
         self.expr = expr
@@ -584,6 +621,7 @@ class Case(Node):
         return 'Case(expr={!r}, elements={!r})'.format(
             self.expr, self.elements)
 
+
 class Default(Node):
     def __init__(self, elements):
         self.elements = elements if elements is not None else []
@@ -596,6 +634,7 @@ class Default(Node):
 
     def __repr__(self):
         return 'Default(elements={!r})'.format(self.elements)
+
 
 class Label(Node):
     def __init__(self, identifier, statement):
@@ -615,6 +654,7 @@ class Label(Node):
         return 'Label(identifier={!r}, statement={!r})'.format(
             self.identifier, self.statement)
 
+
 class Throw(Node):
     def __init__(self, expr):
         self.expr = expr
@@ -627,6 +667,7 @@ class Throw(Node):
 
     def __repr__(self):
         return 'Throw(expr={!r})'.format(self.expr)
+
 
 class Try(Node):
     def __init__(self, statements, catch=None, fin=None):
@@ -648,6 +689,7 @@ class Try(Node):
         return 'Try(statement={!r}, catch={!r}, fin={!r})'.format(
             self.statement, self.catch, self.fin)
 
+
 class Catch(Node):
     def __init__(self, identifier, elements):
         self.identifier = identifier
@@ -668,6 +710,7 @@ class Catch(Node):
         return 'Catch(identifier={!r}, elements={!r})'.format(
             self.identifier, self.elements)
 
+
 class Finally(Node):
     def __init__(self, elements):
         self.elements = elements
@@ -680,6 +723,7 @@ class Finally(Node):
 
     def __repr__(self):
         return 'Finally(elements={!r})'.format(self.elements)
+
 
 class Debugger(Node):
     def __init__(self, value):
@@ -726,8 +770,10 @@ class FuncBase(Node):
         fmt = name + '(identifier={!r}, parameters={!r}, elements={!r})'
         return fmt.format(self.identifier, self.parameters, self.elements)
 
+
 class FuncDecl(FuncBase):
     pass
+
 
 # The only difference is that function expression might not have an identifier
 class FuncExpr(FuncBase):
@@ -751,6 +797,7 @@ class Comma(Node):
     def __repr__(self):
         return 'Comma(left={!r}, right={!r})'.format(self.left, self.right)
 
+
 class EmptyStatement(Node):
     def __init__(self, value):
         self.value = value
@@ -763,6 +810,7 @@ class EmptyStatement(Node):
 
     def __repr__(self):
         return 'EmptyStatement()'
+
 
 class ExprStatement(Node):
     def __init__(self, expr):
@@ -777,6 +825,7 @@ class ExprStatement(Node):
     def __repr__(self):
         return 'ExprStatement(expr={!r})'.format(self.expr)
 
+
 class Elision(Node):
     def __init__(self, value):
         self.value = value
@@ -789,6 +838,7 @@ class Elision(Node):
 
     def __repr__(self):
         return 'Elision()'
+
 
 class This(Node):
     def __init__(self):
